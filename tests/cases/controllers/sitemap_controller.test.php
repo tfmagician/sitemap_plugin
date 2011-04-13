@@ -51,6 +51,10 @@ class TEST_SITEMAP
             'priority' => '0.8',
             'lastmod' => '2011-01-31',
         ),
+        array(
+            'url' => array('controller' => 'posts', 'action' => 'search', ':page'),
+            'paginate' => array('Post'),
+        ),
     );
 }
 
@@ -120,6 +124,16 @@ class SitemapControllerTestCase extends CakeTestCase
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
                 'lastmod' => '2011-01-31',
+            ),
+            FULL_BASE_URL.'/posts/search/1' => array(
+                'changefreq' => 'monthly',
+                'priority' => '1.0',
+                'lastmod' => '2011-01-30',
+            ),
+            FULL_BASE_URL.'/posts/search/2' => array(
+                'changefreq' => 'monthly',
+                'priority' => '1.0',
+                'lastmod' => '2011-01-30',
             ),
         );
         $this->assertEqual($expected, $this->SitemapController->items);

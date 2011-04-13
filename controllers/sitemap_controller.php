@@ -73,26 +73,6 @@ class SitemapController extends SitemapAppController
     }
 
     /**
-     * Gets all actions of specific controller.
-     *
-     * @access private
-     * @param string $controllerName
-     * @return array
-     */
-    function _getControllerActions($controllerName)
-    {
-        $controllerName = Inflector::camelize($controllerName);
-        App::import('Controller', $controllerName);
-        $splitControllerName = split('.', $controllerName);
-        if (count($splitControllerName) == 2) {
-            $controllerName = $splitControllerName[1];
-        }
-        $controllerName = $controllerName.'Controller';
-        $Controller = new $controllerName();
-        return $Controller->methods;
-    }
-
-    /**
      * beforeFilter callback
      *
      * Initials SitemapController::$items.
@@ -122,18 +102,9 @@ class SitemapController extends SitemapAppController
                 $items[Router::url($sitemap['url'], true)] = $params;
                 continue;
             }
-            $sitemap['url']['plugin'] = null;
 
-            if (!isset($sitemap['model'])) {
-                $actions = array($sitemap['url']['action']);
-                if ($sitemap['url']['action'] == '*') {
-                    $actions = $this->_getControllerActions($sitemap['url']['controller']);
-                }
-                foreach ($actions as $action) {
-                    $sitemap['url']['action'] = $action;
-                    $items[Router::url($sitemap['url'], true)] = $params;
-                }
-            } else {
+            $sitemap['url']['plugin'] = null;
+            if (isset($sitemap['model'])) {
                 $Model = ClassRegistry::init($sitemap['model']);
                 if (!isset($sitemap['field'])) {
                     $sitemap['field'] = $Model->primaryKey;
@@ -164,6 +135,30 @@ class SitemapController extends SitemapAppController
                         $items[$url]['lastmod'] = date('Y-m-d', strtotime($data[$Model->alias]['modified']));
                     }
                 }
+            } elseif (isset($sitemap['paginate'])) {
+                $key = array_search(':page', $sitemap['url']);
+                if ($key === false) {
+                    $items[Router::url($sitemap['url'], true)] = $params;
+                    continue;
+                }
+
+                $paging = $this->_getPagingParams($sitemap['url']['controller']);
+                $paging = current($paging);
+                for ($page = 1; $page <= $paging['pageCount']; $page ++) {
+                    $url = $sitemap['url'];
+                    $url[$key] = $page;
+                    $url = Router::url($url, true);
+                    $items[$url] = $params;
+                }
+            } else {
+                $actions = array($sitemap['url']['action']);
+                if ($sitemap['url']['action'] == '*') {
+                    $actions = $this->_getControllerActions($sitemap['url']['controller']);
+                }
+                foreach ($actions as $action) {
+                    $sitemap['url']['action'] = $action;
+                    $items[Router::url($sitemap['url'], true)] = $params;
+                }
             }
         }
         $this->items = $items;
@@ -177,6 +172,60 @@ class SitemapController extends SitemapAppController
     function index()
     {
         $this->set('items', $this->items);
+    }
+
+    /**
+     * Gets all actions of specific controller.
+     *
+     * @access private
+     * @param string $controllerName
+     * @return array
+     */
+    function _getControllerActions($controllerName)
+    {
+        return $this->_getController($controllerName)->methods;
+    }
+
+    /**
+     * Gets paging params of specific controller.
+     *
+     * @access private
+     * @param string $controllerName
+     * @return array
+     */
+    function _getPagingParams($controllerName, $args = array())
+    {
+        $controller =& $this->_getController($controllerName);
+        $controller->params['url']['page'] = 1;
+        $controller->constructClasses();
+        $controller->dispatchMethod('paginate', $args);
+        return $controller->params['paging'];
+    }
+
+    /**
+     * Gets specific controller instance.
+     *
+     * @access private
+     * @param string $controllerName
+     * @return array
+     */
+    function _getController($controllerName)
+    {
+        static $controllers = array();
+
+        $controllerName = Inflector::camelize($controllerName);
+        App::import('Controller', $controllerName);
+        $splitControllerName = split('.', $controllerName);
+        if (count($splitControllerName) == 2) {
+            $controllerName = $splitControllerName[1];
+        }
+        $controllerName = $controllerName.'Controller';
+
+        if (!isset($controllers[$controllerName])) {
+            $controllers[$controllerName] = new $controllerName();
+        }
+        return $controllers[$controllerName];
+
     }
 
 }
