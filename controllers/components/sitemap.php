@@ -134,7 +134,7 @@ class SitemapComponent extends Object
                     continue;
                 }
 
-                $paging = $this->_getPagingParams($sitemap['url']['controller']);
+                $paging = $this->_getPagingParams($sitemap['url']['controller'], $sitemap['paginate']);
                 $paging = current($paging);
                 for ($page = 1; $page <= $paging['pageCount']; $page ++) {
                     $url = $sitemap['url'];
