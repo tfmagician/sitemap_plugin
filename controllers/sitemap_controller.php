@@ -110,8 +110,6 @@ class SitemapController extends SitemapAppController
 
         $items = array();
         foreach ($sitemaps as $sitemap) {
-            $sitemap['url']['plugin'] = null;
-
             $params = array();
             foreach (array('changefreq', 'priority', 'lastmod') as $param) {
                 if (isset($sitemap[$param])) {
@@ -124,6 +122,7 @@ class SitemapController extends SitemapAppController
                 $items[Router::url($sitemap['url'], true)] = $params;
                 continue;
             }
+            $sitemap['url']['plugin'] = null;
 
             if (!isset($sitemap['model'])) {
                 $actions = array($sitemap['url']['action']);
