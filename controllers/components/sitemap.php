@@ -77,6 +77,9 @@ class SitemapComponent extends Object
      */
     function createSitemap()
     {
+        if ($items = Cache::read('sitemap')) {
+            return $items;
+        }
         $default = $this->Config->default;
         $sitemaps = $this->Config->sitemaps;
 
@@ -153,6 +156,7 @@ class SitemapComponent extends Object
                 }
             }
         }
+        Cache::write('sitemap', $items);
         return $items;
     }
 
