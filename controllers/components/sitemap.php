@@ -196,6 +196,7 @@ class SitemapComponent extends Object
             $action = $parsed['action'];
             $args = $parsed['pass'];
         }
+        $controller->params['sitemap'] = true;
         $controller->params['url']['page'] = $controller->params['page'] = 1;
         $controller->constructClasses();
         $controller->dispatchMethod($action, $args);
