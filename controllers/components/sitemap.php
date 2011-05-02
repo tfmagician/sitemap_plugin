@@ -137,7 +137,7 @@ class SitemapComponent extends Object
                     continue;
                 }
 
-                $paging = $this->_getPagingParams($sitemap['url']['controller'], $sitemap['paginate']);
+                $paging = $this->_getPagingParams($sitemap['url'], $sitemap['paginate']);
                 $paging = current($paging);
                 for ($page = 1; $page <= $paging['pageCount']; $page ++) {
                     $url = $sitemap['url'];
@@ -176,15 +176,29 @@ class SitemapComponent extends Object
      * Gets paging params of specific controller.
      *
      * @access private
-     * @param string $controllerName
+     * @param array $url
+     * @param mixed $args
      * @return array
      */
-    function _getPagingParams($controllerName, $args = array())
+    function _getPagingParams($url, $args)
     {
-        $controller =& $this->_getController($controllerName);
-        $controller->params['url']['page'] = 1;
+        if ($args !== true) {
+            $controller =& $this->_getController($url['controller']);
+            $action = 'paginate';
+        } else {
+            foreach ($url as $key => $one) {
+                if ($one == ':page') {
+                    $url[$key] = 1;
+                }
+            }
+            $parsed = Router::parse(Router::url($url));
+            $controller =& $this->_getController($parsed['controller']);
+            $action = $parsed['action'];
+            $args = $parsed['pass'];
+        }
+        $controller->params['url']['page'] = $controller->params['page'] = 1;
         $controller->constructClasses();
-        $controller->dispatchMethod('paginate', $args);
+        $controller->dispatchMethod($action, $args);
         return $controller->params['paging'];
     }
 

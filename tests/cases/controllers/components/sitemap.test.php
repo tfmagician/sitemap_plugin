@@ -55,6 +55,10 @@ class TEST_SITEMAP
             'url' => array('controller' => 'posts', 'action' => 'search', ':page'),
             'paginate' => array('Post'),
         ),
+        array(
+            'url' => array('controller' => 'posts', 'action' => 'search', 1, ':page'),
+            'paginate' => true,
+        ),
     );
 }
 
@@ -132,7 +136,23 @@ class SitemapComponentTestCase extends CakeTestCase
                 'priority' => '1.0',
                 'lastmod' => '2011-01-30',
             ),
+            FULL_BASE_URL.'/posts/search/1/1' => array(
+                'changefreq' => 'monthly',
+                'priority' => '1.0',
+                'lastmod' => '2011-01-30',
+            ),
+            FULL_BASE_URL.'/posts/search/1/2' => array(
+                'changefreq' => 'monthly',
+                'priority' => '1.0',
+                'lastmod' => '2011-01-30',
+            ),
+            FULL_BASE_URL.'/posts/search/1/3' => array(
+                'changefreq' => 'monthly',
+                'priority' => '1.0',
+                'lastmod' => '2011-01-30',
+            ),
         );
+        debug($ret);
         $this->assertEqual($expected, $ret);
     }
 

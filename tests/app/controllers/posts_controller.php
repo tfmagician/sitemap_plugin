@@ -8,4 +8,10 @@ class PostsController extends Controller
         ),
     );
 
+    function search($limit = 2)
+    {
+        $this->paginate['Post']['limit'] = $limit;
+        $this->paginate();
+    }
+
 }
