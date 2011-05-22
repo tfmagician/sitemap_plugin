@@ -152,7 +152,6 @@ class SitemapComponentTestCase extends CakeTestCase
                 'lastmod' => '2011-01-30',
             ),
         );
-        debug($ret);
         $this->assertEqual($expected, $ret);
     }
 

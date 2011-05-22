@@ -58,7 +58,10 @@ class SitemapComponent extends Object
     function startup(&$Controller)
     {
         $gz = $this->RequestHandler->prefers('gz');
-        if (!$this->RequestHandler->isXml() && !$gz) {
+        if (!isset($Controller->usersSitemap)) {
+            $Controller->usersSitemap = false;
+        }
+        if (!$Controller->usersSitemap && !$this->RequestHandler->isXml() && !$gz) {
             $this->cakeError('error404');
         }
         if ($gz) {
