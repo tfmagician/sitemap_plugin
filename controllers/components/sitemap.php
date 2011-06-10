@@ -129,7 +129,7 @@ class SitemapComponent extends Object
                     $url[$key] = $data[$Model->alias][$sitemap['field']];
                     $url = Router::url($url, true);
                     $items[$url] = $params;
-                    if (isset($data[$Model->alias]['modified'])) {
+                    if (empty($items[$url]['lastmod']) && isset($data[$Model->alias]['modified'])) {
                         $items[$url]['lastmod'] = date('Y-m-d', strtotime($data[$Model->alias]['modified']));
                     }
                 }
